@@ -14,7 +14,7 @@ export default function Widget(quill, options) {
 
 	addWidget(quill);
 
-	quill.on(Quill.events.SELECTION_CHANGE, () => {
+	quill.on(Quill.events.EDITOR_CHANGE, () => {
 		const tableModule = quill.getModule("table");
 		const table = tableModule.getTable()[0];
 		if (table) {
@@ -31,7 +31,7 @@ export default function Widget(quill, options) {
 
 const makeTable = (quill, x, y) => {
 	const tableModule = quill.getModule("table");
-	if (!quill.getSelection()) {
+	if (!quill.getSelection(true)) {
 		//need to set selection if there is none
 		quill.setSelection(0); //i.e. field hasnt been clicked
 	}
@@ -69,15 +69,18 @@ const addWidget = quill => {
 		<div id="wi-delete-table">Delete Table</div>
 	</div>`;
 	const tableModule = quill.getModule("table");
-	document
-		.getElementById("wi-add-row")
-		.addEventListener("click", () => tableModule.insertRowBelow());
+	document.getElementById("wi-add-row").addEventListener("click", () => {
+		if (!quill.isEnabled()) return;
+		tableModule.insertRowBelow();
+	});
 
-	document
-		.getElementById("wi-add-column")
-		.addEventListener("click", () => tableModule.insertColumnRight());
+	document.getElementById("wi-add-column").addEventListener("click", () => {
+		if (!quill.isEnabled()) return;
+		tableModule.insertColumnRight();
+	});
 
 	document.getElementById("wi-delete-row").addEventListener("click", () => {
+		if (!quill.isEnabled()) return;
 		tableModule.deleteRow();
 		if (!tableModule.getTable[0]) {
 			hideWidget();
@@ -85,6 +88,7 @@ const addWidget = quill => {
 	});
 
 	document.getElementById("wi-delete-column").addEventListener("click", () => {
+		if (!quill.isEnabled()) return;
 		tableModule.deleteColumn();
 		if (!tableModule.getTable[0]) {
 			hideWidget();
@@ -92,6 +96,7 @@ const addWidget = quill => {
 	});
 
 	document.getElementById("wi-delete-table").addEventListener("click", () => {
+		if (!quill.isEnabled()) return;
 		tableModule.deleteTable();
 		hideWidget();
 	});
